@@ -15,10 +15,10 @@ cmap = plt.cm.viridis
 st.set_page_config(layout="wide")
 
 data = pd.read_excel(
-    r"C:\Users\BenHi\OneDrive - Environment Canterbury\Downloads\essex_data.xlsx",
+    r"essex_data.xlsx",
     sheet_name = "Data")
 data_info = pd.read_excel(
-    r"C:\Users\BenHi\OneDrive - Environment Canterbury\Downloads\essex_data.xlsx",
+    r"essex_data.xlsx",
     sheet_name = "DataDictionary")
 
 # mapping between column name and full name
