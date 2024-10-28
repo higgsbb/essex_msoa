@@ -5,6 +5,28 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import json
 
+def get_area_code_data(area_code, data, stat_cols):
+    print(area_code)
+
+    with open(rf'area_code_geojson/{area_code}.geojson') as f:
+        geodata = json.load(f)
+
+    # append statistics to geojson
+    for s in stat_cols:
+        stat = round(data.loc[
+            data["Area Code"] == area_code, s].max(),
+            2)
+        geodata['features'][0][s] = stat
+    return geodata
+
+
+def get_geo_data(data, stat_cols):
+    geo_data = data["Area Code"].apply(lambda x: get_area_code_data(
+        x, data, stat_cols)
+        )
+
+    return geo_data
+
 
 colour_scales = {"viridis": plt.cm.viridis}
 cmap = plt.cm.viridis
@@ -55,28 +77,6 @@ data['height'] = data["height_selection_norm"]*max_height
 # Scale RGB values to 0-255 range
 data['colour'] = data['colour'].apply(lambda rgb: [int(255 * v) for v in rgb])
 
-def get_area_code_data(area_code, data, stat_cols):
-    print(area_code)
-
-    with open(rf'area_code_geojson/{area_code}.geojson') as f:
-        geodata = json.load(f)
-
-    # append statistics to geojson
-    for s in stat_cols:
-        stat = round(data.loc[
-            data["Area Code"] == area_code, s].max(),
-            2)
-        geodata['features'][0][s] = stat
-    return geodata
-
-
-def get_geo_data(data, stat_cols):
-    geo_data = data["Area Code"].apply(lambda x: get_area_code_data(
-        x, data, stat_cols)
-        )
-
-    return geo_data
-
 layers = []
 geo_data = get_geo_data(data = data, stat_cols = [field_lookup[f] for f in field_lookup])
 for i in data.index:
@@ -87,7 +87,7 @@ for i in data.index:
 
     layer_i = pdk.Layer(
         "GeoJsonLayer",
-        geo_data[i], #f"https://findthatpostcode.uk/areas/{areacode}.geojson",
+        geo_data[i], 
         stroked=False,
         filled=True,
         extruded=True,
